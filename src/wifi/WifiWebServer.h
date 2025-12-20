@@ -723,10 +723,10 @@ public:
     }
 };
 
-class W1 : public WElement
+class WH1 : public WElement
 {
 public:
-    W1(String title)
+    WH1(String title)
     {
         appendBody("<h1>"+String(title)+"</h1>");
     }
@@ -1178,7 +1178,7 @@ public:
   * #include "wifi/WifiWebServer.h"
   *
   * WElement mainContents[] = {
-  *    W1("Hello World"),
+  *    WH1("Hello World"),
   *    WButton("Hello", "hello", []() {
   *       DEBUG_PRINTLN("Hello World");
   *    })
