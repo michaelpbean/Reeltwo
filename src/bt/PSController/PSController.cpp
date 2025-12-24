@@ -1,3 +1,4 @@
+#ifndef USE_BLUEPAD
 #if defined(ESP32)
 
 #include "PSControllerInternal.h"
@@ -1107,4 +1108,5 @@ void PSController::setRumble(float leftIntensity, int leftDuration, float rightI
         }
     }
 }
+#endif
 #endif
