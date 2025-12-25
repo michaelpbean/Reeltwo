@@ -27,7 +27,7 @@ public:
       * Will drive PWM pins
       */
     TankDrivePWM(ServoDispatch& dispatch, uint8_t leftNum, uint8_t rightNum, JoystickController& driveStick) :
-        TankDrivePWM(dispatch, leftNum, rightNum, 0, driveStick)
+        TankDrivePWM(dispatch, leftNum, rightNum, -1, driveStick)
     {
     }
 
@@ -42,6 +42,13 @@ public:
         fRight(rightNum),
         fThrottle(throttleNum)
     {
+        // For PWM drive we want to default to middle position so motors are stopped initially
+        for (uint16_t i = 0; i < dispatch.getNumServos(); i++)
+        {
+            uint16_t middle = (dispatch.getMinimum(i) + dispatch.getMaximum(i)) / 2;
+            dispatch.setNeutral(i, middle);
+        }
+
         setMaxSpeed(1.0f);
     }
 
@@ -64,11 +71,20 @@ protected:
 
     virtual void motor(float left, float right, float throttle) override
     {
-        left = map(left, -1.0f, 1.0f, 0.0f, 1.0f);
-        right = map(right, -1.0f, 1.0f, 0.0f, 1.0f);
+        printf("motor(%f, %f, %f)", left, right, throttle);
+        if (fThrottle != -1)
+        {
+            left = map(left, -1.0f, 1.0f, 0.0f, 1.0f);
+            right = map(right, -1.0f, 1.0f, 0.0f, 1.0f);
+        }
+        else
+        {
+            // Premultiply throttle if no separate throttle pin
+            left = map(left * throttle, -1.0f, 1.0f, 0.0f, 1.0f);
+            right = map(right * throttle, -1.0f, 1.0f, 0.0f, 1.0f);
+        }
 
-        Serial.print("M "); Serial.print(left); Serial.print(", "); Serial.print(right);Serial.print(", "); Serial.println(throttle);
-        throttle = 1.0;
+        printf(" -> left(%f), right(%f)\n", left, right);
         if (fThrottle != -1)
         {
             fDispatch.moveTo(fLeft, left);
@@ -77,8 +93,6 @@ protected:
         }
         else
         {
-            left *= throttle;
-            right *= throttle;
             fDispatch.moveTo(fLeft, left);
             fDispatch.moveTo(fRight, right);
         }

@@ -335,7 +335,7 @@ protected:
                 {
                     speedModifier += getThrottle() * ((1.0f-speedModifier));
                 }
-                return min(max(speedModifier,0.0f),1.0f) * -1.0f;
+                return min(max(speedModifier,0.0f),1.0f);
             }
             else
             {
